@@ -5,14 +5,18 @@ import sys
 
 def copy_files(source_dir, destination_dir):
     try:
-        for root, dirs, files in os.walk(source_dir):
-            for file in files:
-                source_path = os.path.join(root, file)
-                _, ext = os.path.splitext(file)
-                dest_subdir = os.path.join(destination_dir, ext[1:])
+        for item in os.listdir(source_dir):
+            source_path = os.path.join(source_dir, item)
+            if os.path.isdir(source_path):
+                # Рекурсивний виклик для піддиректорій
+                copy_files(source_path, destination_dir)
+            else:
+                _, ext = os.path.splitext(item)
+                ext = ext[1:] if ext else 'no_extension'
+                dest_subdir = os.path.join(destination_dir, ext)
                 os.makedirs(dest_subdir, exist_ok=True)
-                dest_path = os.path.join(dest_subdir, file)
-                shutil.copy(source_path, dest_path)
+                dest_path = os.path.join(dest_subdir, item)
+                shutil.copy2(source_path, dest_path)
                 print(f"Копіюємо {source_path} -> {dest_path}")
     except Exception as e:
         print(f"Помилка при копіюванні: {e}")
